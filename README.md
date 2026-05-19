@@ -14,7 +14,7 @@
 
 # Checklist for DELETE /test-orders/{id}
 
-| Scenario name                                    | Test data    |
-|--------------------------------------------------|--------------|
-| DELETE request returns=204                       | orderId = 10 |
-| DELETE request with incorrect api key,response=401 | api_key = '' |
+| Scenario name                                    | Test data     |
+|--------------------------------------------------|---------------|
+| DELETE request returns=204                       | orderId = 10  |
+| DELETE request with incorrect api key,response=401 | api_key = ' ' |
