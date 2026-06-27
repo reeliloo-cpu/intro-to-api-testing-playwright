@@ -43,9 +43,7 @@ test('Product creation - Return code 200', async ({ request }) => {
   expect(statusCode).toBe(StatusCodes.OK)
 })
 
-
 test('Find order with correct ID - Status 200', async ({ request }) => {
-
   const response = await request.get('https://backend.tallinn-learning.ee/test-orders/1')
 
   console.log('response body:', await response.json())
@@ -58,7 +56,6 @@ test('Find order with correct ID - Status 200', async ({ request }) => {
 })
 
 test('Request with invalid ID - Status -400', async ({ request }) => {
-
   const response = await request.get('https://backend.tallinn-learning.ee/test-orders/11')
 
   expect(response.status()).toBe(400)
