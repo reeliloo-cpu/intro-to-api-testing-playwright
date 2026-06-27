@@ -9,10 +9,7 @@ const incorrectLogin = new Login('Kwa', 'terriblepassword')
 
 test.describe.serial('Authorization flow', () => {
   test.beforeAll(() => {
-    loginDto = new Login(
-      process.env['DL_USERNAME']!,
-      process.env['DL_PASSWORD']!,
-    )
+    loginDto = new Login(process.env['DL_USERNAME']!, process.env['DL_PASSWORD']!)
   })
 
   test('should login and receive authorization token', async ({ request }) => {
