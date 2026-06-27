@@ -6,7 +6,7 @@ on:
       [main, develop, 'HW_*']
   pull_request:
     branches:
-      - [main, develop, 'HW_*']
+      - main
 
 jobs:
   format-lint-test:
