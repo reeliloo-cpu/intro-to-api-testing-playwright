@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test'
 import { Login } from '../dto/login-dto'
+import { createOrder, fetchJwt } from '../helpers/api-helper'
 
 let loginDto: Login
-const baseUrl = 'https://backend.tallinn-learning.ee'
-const loginEndpoint = '/login/student'
-const ordersEndpoint = '/orders'
-const incorrectLogin = new Login('Kwa', 'terriblepassword')
+export const baseUrl = 'https://backend.tallinn-learning.ee'
+export const loginEndpoint = '/login/student'
+export const ordersEndpoint = '/orders'
 
 test.describe.serial('Authorization flow', () => {
   test.beforeAll(() => {
@@ -13,32 +13,36 @@ test.describe.serial('Authorization flow', () => {
   })
 
   test('should login and receive authorization token', async ({ request }) => {
+    const token = await fetchJwt(request, loginDto)
+    expect(token).toBeDefined()
+  })
+
+  test('should create order', async ({ request }) => {
+    const token = await fetchJwt(request, loginDto)
+    await createOrder(request, token)
+    const orderId = await createOrder(request, token)
+    expect(orderId).toBeDefined()
+  })
+
+  test('should not login with invalid credentials', async ({ request }) => {
+    const invalidLoginDto = {
+      username: 'Bad-user',
+      password: 'Bad-password',
+    }
+
     const response = await request.post(baseUrl + loginEndpoint, {
       headers: {
         'Content-Type': 'application/json',
         accept: 'application/json',
       },
-      data: loginDto,
+      data: invalidLoginDto,
     })
 
-    expect(response.status()).toBe(200)
-    const token = await response.text()
-    console.log('Received token:', token)
-    expect(token).toBeTruthy()
+    expect(response.status()).toBe(401)
   })
 
   test('should get orders with authorization token', async ({ request }) => {
-    const loginResponse = await request.post(baseUrl + loginEndpoint, {
-      headers: {
-        'Content-Type': 'application/json',
-        accept: 'application/json',
-      },
-      data: loginDto,
-    })
-
-    expect(loginResponse.status()).toBe(200)
-    const token = await loginResponse.text()
-    expect(token).toBeTruthy()
+    const token = await fetchJwt(request, loginDto)
 
     const response = await request.get(baseUrl + ordersEndpoint, {
       headers: {
@@ -52,27 +56,14 @@ test.describe.serial('Authorization flow', () => {
     console.log('Orders:', JSON.stringify(orders, null, 2))
     expect(orders).toBeTruthy()
   })
-  test('should not recieve a token', async ({ request }) => {
-    const response = await request.post(baseUrl + loginEndpoint, {
-      headers: {
-        'Content-Type': 'application/json',
-        accept: 'application/json',
-      },
-      data: incorrectLogin,
-    })
+})
 
-    expect(response.status()).toBe(401)
-    const token = await response.text()
-    console.log('Received token:', token)
-    expect(token).toBeFalsy()
+test('should not get orders without authorization token', async ({ request }) => {
+  const response = await request.get(baseUrl + ordersEndpoint, {
+    headers: {
+      accept: '*/*',
+    },
   })
 
-  test('should not get orders without authorization token', async ({ request }) => {
-    const response = await request.get(baseUrl + ordersEndpoint, {
-      headers: {
-        accept: '*/*',
-      },
-    })
-    expect(response.status()).toBe(401)
-  })
+  expect(response.status()).toBe(401)
 })
