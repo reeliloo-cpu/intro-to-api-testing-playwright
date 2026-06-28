@@ -5,6 +5,7 @@ let loginDto: Login
 const baseUrl = 'https://backend.tallinn-learning.ee'
 const loginEndpoint = '/login/student'
 const ordersEndpoint = '/orders'
+const incorrectLogin = new Login('Kwa', 'terriblepassword')
 
 test.describe.serial('Authorization flow', () => {
   test.beforeAll(() => {
